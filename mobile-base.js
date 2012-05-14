@@ -11,9 +11,9 @@ var init = function (onSelectFeatureFunction) {
 
     var vector = new OpenLayers.Layer.Vector("Location range", {}); //must also take out vector mention below if remove
 
-    var curbLayer = new OpenLayers.Layer.Vector("Demo curb", {
+    /*var curbLayer = new OpenLayers.Layer.Vector("Demo curb", {
         styleMap: new OpenLayers.StyleMap({
-            externalGraphic: "img/mobile-loc.png",
+            externalGraphic: "css/img/mobile-loc.png",
             graphicOpacity: 1.0,
             graphicWidth: 16,
             graphicHeight: 26,
@@ -22,16 +22,27 @@ var init = function (onSelectFeatureFunction) {
     });
 
     var curbs = getFeatures();
-/*$.getJSON(
-"http://pdxmele.cartodb.com/api/v1/sql?q=SELECT%20*%20FROM%20curb_ramps%20LIMIT%20100&format=geojson"/*,
-function(geojson) {
-$.each(geojson.features, function(i, feature) {
-curbLayer.addGeoJSON(feature);
-});*/
+    curbLayer.addFeatures(curbs);*/
 
-    curbLayer.addFeatures(curbs);
+    var cartoDB = new OpenLayers.Layer.Vector("Carto DB", {
+        projection: new OpenLayers.Projection("EPSG:4326"),
+        strategies: [new OpenLayers.Strategy.Fixed()],
+            protocol: new OpenLayers.Protocol.Script({
+            url: "http://pdxmele.cartodb.com/api/v2/sql",
+            params: {q: "select * from curb_ramps",format:"geojson"},
+            format: new OpenLayers.Format.GeoJSON({
+                ignoreExtraDims: true
+            }),
+            callbackKey: "callback"
+        })/*,
+        eventListeners: {
+            "featuresadded": function () {
+                this.map.zoomToExtent(this.getDataExtent());
+            }
+        }*/
+    });
 
-    var selectControl = new OpenLayers.Control.SelectFeature(curbLayer, {
+    var selectControl = new OpenLayers.Control.SelectFeature(cartoDB, {
         autoActivate:true,
         onSelect: onSelectFeatureFunction});
 
@@ -60,6 +71,9 @@ curbLayer.addGeoJSON(feature);
             selectControl
         ],
         layers: [
+            new OpenLayers.Layer.OSM("OpenStreetMap", null, {
+                transitionEffect: 'resize'
+            }),
             new OpenLayers.Layer.XYZ("MapBox Streets",
                 [
                 "http://a.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png",
@@ -77,9 +91,6 @@ curbLayer.addGeoJSON(feature);
                     numZoomLevels: 17
                     }
             ),
-            new OpenLayers.Layer.OSM("OpenStreetMap", null, {
-                transitionEffect: 'resize'
-            }),
             /*new OpenLayers.Layer.Bing({
                 key: apiKey,
                 type: "Road",
@@ -104,7 +115,8 @@ curbLayer.addGeoJSON(feature);
                 transitionEffect: 'resize'
             }),
             vector,
-            curbLayer
+            //curbLayer,
+            cartoDB
         ],
         center: new OpenLayers.LonLat(-13656000, 5704000),
         zoom:17
@@ -130,6 +142,7 @@ curbLayer.addGeoJSON(feature);
                     pointRadius: 10
                 }
             ),
+            //after geolocates, draws a location range on the map
             new OpenLayers.Feature.Vector(
                 OpenLayers.Geometry.Polygon.createRegularPolygon(
                     new OpenLayers.Geometry.Point(e.point.x, e.point.y),
@@ -144,25 +157,12 @@ curbLayer.addGeoJSON(feature);
         map.zoomToExtent(vector.getDataExtent());
     });
 
-    function getFeatures() {
-        
-
-        var features = 
-//fail cartodb attempts
-/*$.getJSON(
-"http://pdxmele.cartodb.com/api/v1/sql?q=SELECT%20*%20FROM%20curb_ramps%20LIMIT%20100&format=geojson&callback=?",
-function(geojson) {
-$.each(geojson.features, function(i, feature) {
-.addGeoJSON(feature);
-})*/
-
-//$.getJSON('http://pdxmele.cartodb.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM curb_ramps LIMIT 100')
-
-{
+    /*function getFeatures() {
+        var features = {
             "type": "FeatureCollection",
             "features": [
                 { "type": "Feature", "geometry": {"type": "Point", "coordinates": [-13656000, 5704000]},
-                    "properties": {"Name": "Example point", "Type":"Curb ramp", "Status":"Not surveyed"}}/*,
+                    "properties": {"Name": "Example point", "Type":"Curb ramp", "Status":"Not surveyed"}},
                 { "type": "Feature", "geometry": {"type": "Point", "coordinates": [790300, 6573900]},
                     "properties": {"Name": "Marc Jansen", "Country":"Germany", "City":"Bonn"}},
                 { "type": "Feature", "geometry": {"type": "Point", "coordinates": [568600, 6817300]},
@@ -192,13 +192,12 @@ $.each(geojson.features, function(i, feature) {
                 { "type": "Feature", "geometry": {"type": "Point", "coordinates": [1717430.147101, 5954568.7127565]},
                     "properties": {"Name": "Andreas Hocevar", "Country":"Austria", "City":"Graz"}},
                 { "type": "Feature", "geometry": {"type": "Point", "coordinates": [-12362007.067301,5729082.2365672]},
-                    "properties": {"Name": "Tim Schaub", "Country":"United States of America", "City":"Bozeman"}} */
+                    "properties": {"Name": "Tim Schaub", "Country":"United States of America", "City":"Bozeman"}}
             ]
         };
 
         var reader = new OpenLayers.Format.GeoJSON();
-
         return reader.read(features);
-    }
+    }*/
 
 };

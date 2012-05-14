@@ -10,9 +10,11 @@
         <script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
         <link rel="stylesheet" href="style.mobile.css" type="text/css">
         <link rel="stylesheet" href="style.mobile-jq.css" type="text/css">
-        <script src="OpenLayers/OpenLayers.mobile.js"></script>
+        <!--script src="OpenLayers/OpenLayers.mobile.js"></script-->
+        <script src="OpenLayers/OpenLayers.js"></script>
         <script src="mobile-base.js"></script>
         <script src="mobile-jq.js"></script>
+        <script src="form-process.js"></script>
     </head>
     <body>
         <h1 id="title">WPCGIS Inventory App</h1>
@@ -70,10 +72,9 @@
             <div data-theme="c" data-role="content">
                 <!-- <ul id="details-list" data-role="listview">
                 </ul>-->
-                <form name= "curb" action="">
+                <form name= "curbForm" onSubmit="return processCurbForm()">
                   <h4>How many curb ramps are there?</h4>
                     <select name="number">
-                    <option value="">Select</option>
                     <option value="0">0</option>
                     <option value="1">1, serves one direction only</option>
                     <option value="1+">1, but serves all directions of travel</option>
@@ -82,21 +83,20 @@
                     </select>
                   <h4>What is their condition?</h4>
                     <select name="condition">
-                    <option value="">Select</option>
                     <option value="good">Good</option>
                     <option value="fair">Fair</option>
                     <option value="poor">Poor</option>
                     </select>
                   <h4>How are their slopes?</h4>
                     <select name="slope">
-                    <option value="">Select</option>
                     <option value="ok">OK</option>
                     <option value="steep">Too steep</option>
                     </select>
-                    <br />
+                    <!--br />
                     Username: <input type="text" name="username" /><br />
                     Password: <input type="password" name="pwd" />
-                    <br />
+                    <br /-->
+                  <h4>Ready to send?</h4>
                     <input type="submit" value="Submit" />
                 </form>
             </div>
