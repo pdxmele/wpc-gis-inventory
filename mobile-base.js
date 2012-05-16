@@ -29,7 +29,7 @@ var init = function (onSelectFeatureFunction) {
         strategies: [new OpenLayers.Strategy.Fixed()],
             protocol: new OpenLayers.Protocol.Script({
             url: "http://pdxmele.cartodb.com/api/v2/sql",
-            params: {q: "select * from curb_ramps",format:"geojson"},
+            params: {q: "select * from corners",format:"geojson"},
             format: new OpenLayers.Format.GeoJSON({
                 ignoreExtraDims: true
             }),
@@ -118,8 +118,8 @@ var init = function (onSelectFeatureFunction) {
             //curbLayer,
             cartoDB
         ],
-        center: new OpenLayers.LonLat(-13656000, 5704000),
-        zoom:17
+        center: new OpenLayers.LonLat(-13655000, 5709500),
+        zoom:18
     });
 
     var style = {

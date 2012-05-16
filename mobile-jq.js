@@ -48,6 +48,20 @@ $(document).ready(function() {
     });
     
     $('#popup').live('pageshow',function(event, ui){
+        for (var attr in selectedFeature.attributes){
+            if (attr == "id") {
+                document.getElementById("cornerID").innerHTML = selectedFeature.attributes[attr];
+            }
+            if (attr == "direction"){
+                document.getElementById("direction").innerHTML = selectedFeature.attributes[attr];
+            }
+            if (attr == "st_left_nm"){
+                document.getElementById("streetR").innerHTML = selectedFeature.attributes[attr];
+            }
+            if (attr == "st_rt_nm"){
+                document.getElementById("streetL").innerHTML = selectedFeature.attributes[attr];
+            }
+        }
         
         //write something like "if selected feature is of x type, show x form, if of y type, y form, etc."
         
