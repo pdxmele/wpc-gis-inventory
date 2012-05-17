@@ -8,7 +8,6 @@
         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css">
         <link rel="stylesheet" href="style.mobile.css" type="text/css">
         <link rel="stylesheet" href="style.mobile-jq.css" type="text/css">
-        <script type="text/javascript" src="form-process.js"></script>
         <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
         <script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
         <!--script src="OpenLayers/OpenLayers.mobile.js"></script-->
@@ -17,6 +16,28 @@
         <script src="mobile-jq.js"></script>
     </head>
     <body>
+        <script>
+          function processCornerForm() {
+            //grab the information from the form
+            var id = document.getElementById("cornerID").innerHTML;
+            var number = document.cornerForm.number.value;
+            var condition = document.cornerForm.condition.value;
+            var slope = document.cornerForm.slope.value;
+            //put together the query
+            var query = "q=UPDATE corners SET number = '"+number+"', condition = '"+condition+"', slope = '"+slope+"' where id = '"+id+"'&api_key=xxxxxx";
+            
+            //for debugging
+            //alert(query);
+            //document.getElementById("querytest").innerHTML = query;
+            
+            //post the query!
+            $.post("http://pdxmele.cartodb.com/api/v2/sql", query, alert ("Successfully posted to database"));
+
+            //go back to the main page
+            window.location.replace(window.location.href.split("#")[0] + "#mappage");
+            return;
+          }
+        </script>
         <h1 id="title">WPCGIS Inventory App</h1>
         <div id="tags">
           mobile, pedestrian, walking, wpc, gis
@@ -67,10 +88,13 @@
 
         <div id="popup" data-role="dialog">
             <div display="inline" data-theme="d" data-role="header">
-                <h1>Edit details - Corner #<div id="cornerID"></div><br />
-                <div id="direction"></div> corner of <div id="streetR"></div> and <div id="streetL"></div></h1>
+              <h1>Edit details</h1>
             </div>
             <div data-theme="c" data-role="content">
+              <div style="text-align:center">
+                <h3>Corner #<div id="cornerID" style="display: inline"></div><br />
+                <div id="direction" style="display: inline">></div> corner of <div id="streetR" style="display: inline"></div> and <div id="streetL" style="display: inline"></div></h3>
+              </div>
                 <!-- <ul id="details-list" data-role="listview">
                 </ul>-->
                 <form name= "cornerForm">
