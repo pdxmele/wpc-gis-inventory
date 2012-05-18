@@ -5,26 +5,33 @@
         <title>WPCGIS Inventory App</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
         <meta name="apple-mobile-web-app-capable" content="yes">
+
         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css">
         <link rel="stylesheet" href="style.mobile.css" type="text/css">
         <link rel="stylesheet" href="style.mobile-jq.css" type="text/css">
+
         <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
         <script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
+
         <!--script src="OpenLayers/OpenLayers.mobile.js"></script-->
         <script src="OpenLayers/OpenLayers.js"></script>
         <script src="mobile-base.js"></script>
         <script src="mobile-jq.js"></script>
     </head>
+
     <body>
         <script>
+          //this function sends the form info to CartoDB
           function processCornerForm() {
+
             //grab the information from the form
             var id = document.getElementById("cornerID").innerHTML;
             var number = document.cornerForm.number.value;
             var condition = document.cornerForm.condition.value;
             var slope = document.cornerForm.slope.value;
+
             //put together the query
-            var query = "q=UPDATE corners SET number = '"+number+"', condition = '"+condition+"', slope = '"+slope+"' where id = '"+id+"'&api_key=xxxxxx";
+            var query = "q=UPDATE corners SET evaluated = 'y', number = '"+number+"', condition = '"+condition+"', slope = '"+slope+"' where id = '"+id+"'&api_key=x";
             
             //for debugging
             //alert(query);
@@ -38,6 +45,7 @@
             return;
           }
         </script>
+
         <h1 id="title">WPCGIS Inventory App</h1>
         <div id="tags">
           mobile, pedestrian, walking, wpc, gis
@@ -52,7 +60,6 @@
           </div>
 
           <div data-role="footer">
-            <!-- <a href="#searchpage" data-icon="search" data-role="button">Search</a> -->
             <a href="#" id="locate" data-icon="locate" data-role="button">Locate</a>
             <a href="#layerspage" data-icon="layers" data-role="button">Layers</a>
           </div>
@@ -63,18 +70,6 @@
                data-iconpos="notext"></a>
           </div>
         </div>
-
-        <!-- <div data-role="page" id="searchpage">
-          <div data-role="header">
-            <h1>Search</h1>
-          </div>
-          <div data-role="fieldcontain">
-            <input type="search" name="query" id="query"
-                   value="" placeholder="Search for places"
-                   autocomplete="off"/>
-          </div>
-          <ul data-role="listview" data-inset="true" id="search_results"></ul> 
-        </div> -->
 
         <div data-role="page" id="layerspage">
           <div data-role="header">
@@ -95,8 +90,7 @@
                 <h3>Corner #<div id="cornerID" style="display: inline"></div><br />
                 <div id="direction" style="display: inline">></div> corner of <div id="streetR" style="display: inline"></div> and <div id="streetL" style="display: inline"></div></h3>
               </div>
-                <!-- <ul id="details-list" data-role="listview">
-                </ul>-->
+
                 <form name= "cornerForm">
                   <h4>How many curb ramps are there?</h4>
                     <select name="number">
@@ -117,15 +111,13 @@
                     <option value="ok">OK</option>
                     <option value="steep">Too steep</option>
                     </select>
-                    <!--br />
-                    Username: <input type="text" name="username" /><br />
-                    Password: <input type="password" name="pwd" />
-                    <br /-->
                   <h4>Ready to send?</h4>
                     <input type="button" value="Submit" onClick="processCornerForm()" />
                 </form>
-                <div id="querytest"></div>
+                <!--div id="querytest"></div-->
+
             </div>
         </div>
+
     </body>
 </html>
