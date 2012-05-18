@@ -10,7 +10,7 @@ var init = function (onSelectFeatureFunction) {
 
     var vector = new OpenLayers.Layer.Vector("Location range", {});
 
-    var cartoDB = new OpenLayers.Layer.Vector("Carto DB", {
+    var cartoDB = new OpenLayers.Layer.Vector("Corners", {
         projection: new OpenLayers.Projection("EPSG:4326"),
         strategies: [new OpenLayers.Strategy.BBOX(), 
             new OpenLayers.Strategy.Refresh({interval: 60000, force: true})],
