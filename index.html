@@ -6,12 +6,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
         <meta name="apple-mobile-web-app-capable" content="yes" />
 
-        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css">
+        <!--css links-->
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" type="text/css">
         <link rel="stylesheet" href="style.mobile.css" type="text/css">
         <link rel="stylesheet" href="style.mobile-jq.css" type="text/css">
 
-        <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
-        <script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
+        <!--jQuery links-->
+        <script src="jquery/jquery-1.6.4.min.js"></script>
+        <script src="jquery/jquery.mobile-1.0.1.min.js"></script>
 
         <!--script src="OpenLayers/OpenLayers.mobile.js"></script-->
         <script src="OpenLayers/OpenLayers.js"></script>
@@ -31,7 +33,8 @@
             var slope = document.cornerForm.slope.value;
 
             //put together the query
-            var query = "q=UPDATE corners SET evaluated = 'y', number = '"+number+"', condition = '"+condition+"', slope = '"+slope+"' where id = '"+id+"'&api_key=x";
+            var query = "q=UPDATE corners SET evaluated = 'y', number = '"+number+"', condition = '"+condition+"', slope = '"+slope+"' where id = '"+id+"'&api_key=df65312f62568527b7750a1266233be8a3d6c56c";
+            //this key is mine for the purposes of this test/dev site, you need to get your own with your cartodb account
             
             //for debugging
             //alert(query);
