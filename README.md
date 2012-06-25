@@ -1,8 +1,8 @@
 wpc-gis-inventory
 =================
 
-Work on a mobile webpage for inventorying curb ramps, sidewalks, crosswalks, and other attributes of intersections.
+A mobile webpage for inventorying curb ramps & other similar features.
 
-Will use HTML, CSS, javascript, OpenLayers, jQuery, CartoDB, etc.
+Uses HTML, CSS, javascript, OpenLayers, jQuery, CartoDB, etc. & based mostly on OpenLayers examples.
 
-So far based mostly on OpenLayers examples.
+Testing site currently hosted at http://home.comcast.net/~saxbarm/wpc/inventory.html
