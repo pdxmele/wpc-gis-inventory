@@ -10,18 +10,27 @@ var init = function (onSelectFeatureFunction) {
 
     var vector = new OpenLayers.Layer.Vector("Location range", {});
 
+    //unique styling so evaluated = y shows up differently
+    var myStyleMap = new OpenLayers.StyleMap({pointRadius: 7});
+    var lookup = {
+      "y": {fillColor: "green"},
+      "n": {fillColor: "orange"}
+    }
+    myStyleMap.addUniqueValueRules("default", "evaluated", lookup);
+
     var cartoDB = new OpenLayers.Layer.Vector("Corners", {
         projection: new OpenLayers.Projection("EPSG:4326"),
         strategies: [new OpenLayers.Strategy.BBOX(), 
             new OpenLayers.Strategy.Refresh({interval: 60000, force: true})],
             protocol: new OpenLayers.Protocol.Script({
             url: "http://pdxmele.cartodb.com/api/v2/sql",
-            params: {q: "select * from corners where evaluated is null", format:"geojson"},
+            params: {q: "select * from corners", format:"geojson"},
             format: new OpenLayers.Format.GeoJSON({
                 ignoreExtraDims: true
             }),
             callbackKey: "callback"
-        })
+        }),
+            styleMap: myStyleMap
     });
 
     var selectControl = new OpenLayers.Control.SelectFeature(cartoDB, {
