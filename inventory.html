@@ -28,12 +28,14 @@
 
             //grab the information from the form
             var id = document.getElementById("cornerID").innerHTML;
-            var number = document.cornerForm.number.value;
-            var condition = document.cornerForm.condition.value;
-            var slope = document.cornerForm.slope.value;
+            var rRamp = document.cornerForm.streetRramp.value;
+            var lRamp = document.cornerForm.streetLramp.value;
+            var texture = document.cornerForm.texture.value;
+            var flags = document.cornerForm.flags.value;
 
             //put together the query
-            var query = "q=UPDATE corners SET evaluated = 'y', number = '"+number+"', condition = '"+condition+"', slope = '"+slope+"' where id = '"+id+"'&api_key=x";
+            var query = "q=UPDATE corners SET evaluated = 'y', rramp = '"+rRamp+"', lramp = '"+lRamp+"', texture = '"+texture+"', flags = '"+flags+"' where id = '"+id+"'&api_key=df65312f62568527b7750a1266233be8a3d6c56c";
+            //the above key is mine for the purposes of this test/dev site, you need to get your own with your cartodb account
             
             //for debugging
             //alert(query);
@@ -53,7 +55,7 @@
           mobile, pedestrian, walking, wpc, gis
         </div>
         <p id="shortdesc">
-          An app for use by the WPC GIS Jam group and volunteers for a curb ramp and sidewalk inventory in Portland, OR.
+          An app for use by the WPC GIS Jam group and volunteers for a curb ramp inventory in Portland, OR.
         </p>
 
         <div data-role="page" id="mappage">
@@ -85,34 +87,46 @@
 
         <div id="popup" data-role="dialog">
             <div display="inline" data-theme="d" data-role="header">
-              <h1>Edit details</h1>
+              <h1>Edit Corner Details</h1>
             </div>
             <div data-theme="c" data-role="content">
               <div style="text-align:center">
-                <h3>Corner #<div id="cornerID" style="display: inline"></div><br />
-                <div id="direction" style="display: inline">></div> corner of <div id="streetR" style="display: inline"></div> and <div id="streetL" style="display: inline"></div></h3>
+                <h3>Corner #<div id="cornerID" style="display: inline"></div> - 
+                <div id="direction" style="display: inline"></div> corner<!-- of <div id="streetR" style="display: inline"></div> and <div id="streetL" style="display: inline"></div>--></h3>
               </div>
 
                 <form name= "cornerForm">
-                  <h4>How many curb ramps are there?</h4>
-                    <select name="number">
-                    <option value="0">0</option>
-                    <option value="1">1, serves one direction only</option>
-                    <option value="1p">1, but serves all directions of travel</option>
-                    <option value="2">2</option>
-                    <option value="2p">More than 2</option>
+                  <h4>Is there a curb ramp for crossing <div id="streetR" style="display: inline"></div>?</h4>
+                    <select name="streetRramp">
+                    <option value="y">yes</option>
+                    <option value="n">no</option>
                     </select>
-                  <h4>What is their condition?</h4>
-                    <select name="condition">
-                    <option value="good">Good</option>
-                    <option value="fair">Fair</option>
-                    <option value="poor">Poor</option>
+                  <h4>Is there a curb ramp for crossing <div id="streetL" style="display: inline"></div>?</h4>
+                    <select name="streetLramp">
+                    <option value="y">yes</option>
+                    <option value="n">no</option>
                     </select>
-                  <h4>How are their slopes?</h4>
-                    <select name="slope">
-                    <option value="ok">OK</option>
-                    <option value="steep">Too steep</option>
+                  <h4>Are the ramps textured?</h4>
+                    <select name="texture">
+                    <option value="y">yes</option>
+                    <option value="n">no</option>
+                    <option value="r">only for the first street</option>
+                    <option value="l">only for the second street</option>
                     </select>
+                  <h4>Any potential problems with the following:</h4>
+                    <select name="flags">
+                    <option value="none">none</option>
+                    <option value="safety">safety</option>
+                    <option value="slope">slope</option>
+                    <option value="drainage">drainage</option>
+                    <option value="safety, slope">safety and slope</option>
+                    <option value="safety, drainage">safety and drainage</option>
+                    <option value="slope, drainage">slope and drainage</option>
+                    <option value="safety, slope, drainage">safety, slope, and drainage</option>
+                    </select>
+                    <!--<input type="checkbox" name="flag" value="safety"/>Safety 
+                    <input type="checkbox" name="flag" value="slope"/>Slope 
+                    <input type="checkbox" name="flag" value="slope"/>Drainage-->
                   <h4>Ready to send?</h4>
                     <input type="button" value="Submit" onClick="processCornerForm()" />
                 </form>

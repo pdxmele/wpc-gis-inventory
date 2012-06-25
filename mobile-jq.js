@@ -63,57 +63,7 @@ $(document).ready(function() {
             }
         }
         
-        //write something like "if selected feature is of x type, show x form, if of y type, y form, etc."
-        
-        /*old popup
-        var li = "";
-        for(var attr in selectedFeature.attributes){
-            li += "<li><div style='width:25%;float:left'>" + attr + "</div><div style='width:75%;float:right'>" 
-            + selectedFeature.attributes[attr] + "</div></li>";
-        }
-        $("ul#details-list").empty().append(li).listview("refresh");
-        */
     });
-
-    /* $('#searchpage').live('pageshow',function(event, ui){
-        $('#query').bind('change', function(e){
-            $('#search_results').empty();
-            if ($('#query')[0].value === '') {
-                return;
-            }
-            $.mobile.showPageLoadingMsg();
-
-            // Prevent form send
-            e.preventDefault();
-
-            var searchUrl = 'http://ws.geonames.org/searchJSON?featureClass=P&maxRows=10';
-            searchUrl += '&name_startsWith=' + $('#query')[0].value;
-            $.getJSON(searchUrl, function(data) {
-                $.each(data.geonames, function() {
-                    var place = this;
-                    $('<li>')
-                        .hide()
-                        .append($('<h2 />', {
-                            text: place.name
-                        }))
-                        .append($('<p />', {
-                            html: '<b>' + place.countryName + '</b> ' + place.fcodeName
-                        }))
-                        .appendTo('#search_results')
-                        .click(function() {
-                            $.mobile.changePage('#mappage');
-                            var lonlat = new OpenLayers.LonLat(place.lng, place.lat);
-                            map.setCenter(lonlat.transform(gg, sm), 10);
-                        })
-                        .show();
-                });
-                $('#search_results').listview('refresh');
-                $.mobile.hidePageLoadingMsg();
-            });
-        });
-        // only listen to the first event triggered
-        $('#searchpage').die('pageshow', arguments.callee);
-    }); */
 
 });
 
