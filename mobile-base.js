@@ -1,4 +1,4 @@
-// My API key. Please get your own at http://bingmapsportal.com/ and use that instead.
+// My Bing API key. Please get your own at http://bingmapsportal.com/ and use that instead.
 var apiKey = "Ao5Ew1XnxVey8Mh0jgfL32mbQN1pNLQoDv48u1r5BJrGsf8r0Bach7FYO5wTpbHl";
 
 // initialize map when page ready

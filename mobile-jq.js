@@ -52,10 +52,10 @@ $(document).ready(function() {
             if (attr == "id") {
                 document.getElementById("cornerID").innerHTML = selectedFeature.attributes[attr];
             }
-            if (attr == "direction"){
+            if (attr == "c_direct"){
                 document.getElementById("direction").innerHTML = selectedFeature.attributes[attr];
             }
-            if (attr == "st_left_nm"){
+            if (attr == "st_lf_nm"){
                 document.getElementById("streetR").innerHTML = selectedFeature.attributes[attr];
             }
             if (attr == "st_rt_nm"){
