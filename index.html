@@ -39,7 +39,7 @@
         var bing = new L.BingLayer("Ao5Ew1XnxVey8Mh0jgfL32mbQN1pNLQoDv48u1r5BJrGsf8r0Bach7FYO5wTpbHl");
 
         var mapQuest = new L.TileLayer("http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png", {
-                maxZoom: 18,
+                //maxZoom: 18,
                 subdomains: ["otile1", "otile2", "otile3", "otile4"],
                 attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>. Map data (c) <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> contributors, CC-BY-SA.'
         });
@@ -50,7 +50,7 @@
             user_name:'pdxmele',
             table_name: 'corners',
             query: "SELECT * FROM {{table_name}}",
-            tile_style: "#{{table_name}}{marker-fill:red}",
+            //tile_style: "#{{table_name}}{marker-fill:red}",
             interactivity: "cartodb_id",
             featureOver: function(ev,latlng,pos,data) {
               document.body.style.cursor = "pointer";
