@@ -108,7 +108,7 @@ var init = function (onSelectFeatureFunction) {
             vector,
             cartoDB
         ],
-        center: new OpenLayers.LonLat(-13655000, 5709500),
+        center: new OpenLayers.LonLat(-13654000, 5705400),
         zoom:18
     });
 
