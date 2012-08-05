@@ -19,12 +19,12 @@ var init = function (onSelectFeatureFunction) {
     myStyleMap.addUniqueValueRules("default", "evaluated", lookup);
 
     var cartoDB = new OpenLayers.Layer.Vector("Corners", {
-        projection: new OpenLayers.Projection("EPSG:4326"),
+        projection: sm,
         strategies: [new OpenLayers.Strategy.BBOX(), 
             new OpenLayers.Strategy.Refresh({interval: 60000, force: true})],
             protocol: new OpenLayers.Protocol.Script({
             url: "http://pdxmele.cartodb.com/api/v2/sql",
-            params: {q: "select * from corners", format:"geojson"},
+            params: {q: "select * from corners", format: "geojson"},
             format: new OpenLayers.Format.GeoJSON({
                 ignoreExtraDims: true
             }),
