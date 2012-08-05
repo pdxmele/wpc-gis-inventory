@@ -10,6 +10,7 @@
 
         <!--leaflet & leaflet vectors links-->
         <script src="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
+        <script src="Bing.js"></script>
         <script type="text/javascript" src="Vizzuality-cartodb-leaflet-d362dc2/js/wax.leaf.min-7.0.0dev1-touched.js"></script>
         <script type="text/javascript" src="Vizzuality-cartodb-leaflet-d362dc2/dist/cartodb-leaflet-min.js"></script>
         <!--script type="text/javascript" src="JasonSanford-leaflet-vector-layers-70b2c88/dist/lvector.js"></script-->
@@ -35,6 +36,8 @@
             zoom: 18
         });
 
+        var bing = new L.BingLayer("Ao5Ew1XnxVey8Mh0jgfL32mbQN1pNLQoDv48u1r5BJrGsf8r0Bach7FYO5wTpbHl");
+
         var mapQuest = new L.TileLayer("http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png", {
                 maxZoom: 18,
                 subdomains: ["otile1", "otile2", "otile3", "otile4"],
@@ -58,6 +61,8 @@
             auto_bound: false
             });
         map.addLayer(cartodb_leaflet);
+
+        map.addControl(new L.Control.Layers({'MapQuest Open':mapQuest, "Bing Aerial":bing}, {}));
 
         /*var corners = new lvector.CartoDB({
             user: "pdxmele",
