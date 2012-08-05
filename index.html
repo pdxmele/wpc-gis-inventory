@@ -3,19 +3,22 @@
     <head>
         <meta charset="utf-8">
         <title>WPC-GIS Curb Ramp Inventory App</title>
-        <meta name="description" content="">
+        <meta name="description" content="An app for use by the WPC GIS Jam group and volunteers for a curb ramp inventory in Portland, OR.">
         <meta name="author" content="Mele Sax-Barnett http://pdxmele.github.com/pdxmele">
-
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-        <!--leaflet & leaflet vectors links-->
+        <!--leaflet & jquery links-->
         <script src="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
         <script src="bing.js"></script>
         <script type="text/javascript" src="Vizzuality-cartodb-leaflet-d362dc2/js/wax.leaf.min-7.0.0dev1-touched.js"></script>
         <script type="text/javascript" src="Vizzuality-cartodb-leaflet-d362dc2/dist/cartodb-leaflet-min.js"></script>
+        <script type="text/javascript" src="Vizzuality-cartodb-leaflet-d362dc2/dist/cartodb-popup-min.js"></script>
         <!--script type="text/javascript" src="JasonSanford-leaflet-vector-layers-70b2c88/dist/lvector.js"></script-->
+        <!--script src="http://code.jquery.com/jquery-1.7.1.min.js"></script-->
+        <!--script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script-->
 
         <!-- styles -->
+        <!--link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" /-->
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.css" />
         <!--[if IE]> <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /> <![endif]-->
         <link href="Vizzuality-cartodb-leaflet-d362dc2/css/cartodb-leaflet.css" rel="stylesheet" type="text/css" />
@@ -39,7 +42,7 @@
         var bing = new L.BingLayer("Ao5Ew1XnxVey8Mh0jgfL32mbQN1pNLQoDv48u1r5BJrGsf8r0Bach7FYO5wTpbHl");
 
         var mapQuest = new L.TileLayer("http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png", {
-                //maxZoom: 18,
+                maxZoom: 18,
                 subdomains: ["otile1", "otile2", "otile3", "otile4"],
                 attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>. Map data (c) <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> contributors, CC-BY-SA.'
         });
@@ -51,18 +54,45 @@
             table_name: 'corners',
             query: "SELECT * FROM {{table_name}}",
             //tile_style: "#{{table_name}}{marker-fill:red}",
-            interactivity: "cartodb_id",
+            interactivity: "cartodb_id, c_direct, st_lf_nm, st_rt_nm, to_dir_a, to_dir_b",
             featureOver: function(ev,latlng,pos,data) {
-              document.body.style.cursor = "pointer";
-            },
+                document.body.style.cursor = "pointer";
+                },
             featureOut: function() {
-              document.body.style.cursor = "default";
+                document.body.style.cursor = "default";
+                },
+            featureClick: function(ev,latlng,pos,data) {
+                // Set popup content
+                // You can pass an Object, an Array or a String
+                popup.setContent(data);
+                // Set latlng
+                popup.setLatLng(latlng);
+                // Show it!
+                map.openPopup(popup);
             },
             auto_bound: false
             });
         map.addLayer(cartodb_leaflet);
 
+        var popup = new L.CartoDBPopup();
+
+        //cartodb_leaflet.bindPopup("Test popup!");
+
         map.addControl(new L.Control.Layers({'MapQuest Open':mapQuest, "Bing Aerial":bing}, {}));
+        
+        /*function onLocationFound(e) {
+            var radius = e.accuracy / 2;
+            L.marker(e.latlng).addTo(map)
+                .bindPopup("You are within " + radius + " meters from this point").openPopup();
+            L.circle(e.latlng, radius).addTo(map);
+            }*/
+        function onLocationError(e) {
+            alert(e.message);
+            }
+        //map.on('locationfound', onLocationFound);
+        map.on('locationerror', onLocationError);
+
+        map.locate({setView: true, maxZoom: 18});
 
         /*var corners = new lvector.CartoDB({
             user: "pdxmele",
