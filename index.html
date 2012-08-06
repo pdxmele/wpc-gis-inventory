@@ -34,26 +34,33 @@
 
     <body>
         <div id="map"></div>
-        <div data-role="popup" id="myPopup">
-            <div style="text-align:center"><h4>Corner #<div id="c_id" style="display: inline"></div> - <div id="c_dir" style="display: inline"></div> corner of <div id="rt_nm" style="display: inline"></div> and <div id="lf_nm" style="display: inline"></div></h4></div>
+        <div data-role="popup" id="myPopup" class="ui-content" data-overlay-theme="a" data-theme="b">
+            <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+            <div style="text-align:center"><h4>Corner #<div id="c_id" style="display: inline"></div> - <div id="c_dir" style="display: inline"></div> corner of</h4>
+            <h4><div id="rt_nm" style="display: inline"></div> and <div id="lf_nm" style="display: inline"></div></h4></div>
             <form name= "cornerForm">
-                <h4>Is there a curb ramp for crossing to the <div id="dir_a" style="display: inline"></div>?</h4>
+                <span>Is there a curb ramp for crossing to the <div id="dir_a" style="display: inline"></div>?</span>
                 <select name="aRamp">
+                    <option>Select</option>
                     <option value="y">yes</option>
                     <option value="n">no</option>
                 </select>
-                <h4>Is there a curb ramp for crossing to the <div id="dir_b" style="display: inline"></div>?</h4>
+                <span>Is there a curb ramp for crossing to the <div id="dir_b" style="display: inline"></div>?</span>
                 <select name="bRamp">
-                    <option value="y">yes</option><option value="n">no</option>
+                    <option>Select</option>
+                    <option value="y">yes</option>
+                    <option value="n">no</option>
                 </select>
-                <h4>Are the ramps textured?</h4>
+                <span>Are the ramps textured?</span>
                 <select name="texture">
+                    <option>Select</option>
                     <option value="y">yes</option>
                     <option value="n">no</option><option value="r">only for the first crossing</option>
                     <option value="l">only for the second crossing</option>
                 </select>
-                <h4>Any potential problems with the following:</h4>
+                <span>Any potential problems with the following:</span>
                 <select name="flags">
+                    <option select="">Select</option>
                     <option value="none">none</option>
                     <option value="safety">safety</option>
                     <option value="slope">slope</option>
@@ -63,7 +70,7 @@
                     <option value="slope, drainage">slope and drainage</option>
                     <option value="safety, slope, drainage">safety, slope, and drainage</option>
                 </select>
-                <h4>Ready to send?</h4><input type="button" value="Submit" onClick="processCornerForm()" />
+                <span>Ready to send?</span><input type="button" value="Submit" onClick="processCornerForm()" />
             </form>
         </div>
     </body>
@@ -73,7 +80,7 @@
     $(document).ready(function() {
         $.ajaxSetup({cache:false});
         $('#map').css('height', ($(window).height()));
-        
+
         var map = new L.Map('map', {
             center: new L.LatLng(45.53266, -122.66002),
             zoom: 18
@@ -145,7 +152,7 @@
                 $("div#dir_b").html(dir_b);
 
                 //tell jQuery to open the popup
-                $('#myPopup').popup("open");
+                $('#myPopup').popup("open", {positionTo: "window"});
 
                 //**For a CartoDB popup, example from CartoDB website. If you use this, need to enable cartoDB popup script too
                 // Set popup content
@@ -181,7 +188,8 @@
 
         map.addControl(new L.Control.Layers({'MapQuest Open':mapQuest, "Bing Aerial":bing}, {}));
         
-        /*function onLocationFound(e) {
+        /*various other optional location stuff from leaflet mobile example
+        function onLocationFound(e) {
             var radius = e.accuracy / 2;
             L.marker(e.latlng).addTo(map)
                 .bindPopup("You are within " + radius + " meters from this point").openPopup();
@@ -193,9 +201,17 @@
         //map.on('locationfound', onLocationFound);
         map.on('locationerror', onLocationError);
         map.locate({setView: true, maxZoom: 18});
+
+        /*//refresh CartoDB Layer (from leaflet plugin docs)
+        //setOptions: Change any parameter at the same time refreshing the tiles once Example: 
+        //cartodb_leaflet.setOptions({query: "SELECT * FROM corners"}); 
+        map.on('mouseenter', function(e) {
+            cartodb_leaflet.setOptions({query: "SELECT * FROM corners"}); //NOT WORKING- TODO
+            //cartodb_leaflet.redraw(); 
+            });*/
         }
     )
-    
+
     //this function sends the form info to CartoDB
     function processCornerForm() {
 
@@ -209,17 +225,16 @@
         //put together the query
         var query = "q=UPDATE corners SET evaluated = 'y', rramp = '"+a_ramp+"', lramp = '"+b_ramp+"', texture = '"+texture+"', flags = '"+flags+"' where id = '"+id+"'&api_key=df65312f62568527b7750a1266233be8a3d6c56c";
         //the above key is mine for the purposes of this test/dev site, you will get your own with your cartodb account
-            
+                
         //for debugging
         //alert(query);
-        //document.getElementById("querytest").innerHTML = query;
-            
+                
         //post the query!
         $.post("http://pdxmele.cartodb.com/api/v2/sql", query, alert ("Successfully posted to database"));
 
         //go back to the main page
-        //window.location.replace(window.location.href.split("#")[0] + "#mappage");
-        $('myPopup').popup("close");
+        $('#myPopup').popup("close");
+        
         return;
         }
     
