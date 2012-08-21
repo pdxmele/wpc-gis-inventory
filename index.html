@@ -10,9 +10,8 @@
         <!--leaflet & jquery links-->
         <script src="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
         <script src="bing.js"></script>
-        <script type="text/javascript" src="Vizzuality-cartodb-leaflet-d362dc2/js/wax.leaf.min-7.0.0dev1-touched.js"></script>
-        <script type="text/javascript" src="Vizzuality-cartodb-leaflet-d362dc2/dist/cartodb-leaflet-min.js"></script>
-        <!--script type="text/javascript" src="Vizzuality-cartodb-leaflet-d362dc2/dist/cartodb-popup-min.js"></script-->
+        <script type="text/javascript" src="Vizzuality-cartodb-leaflet-fe6548b/js/wax.leaf.min-7.0.0dev1-touched.js"></script>
+        <script type="text/javascript" src="Vizzuality-cartodb-leaflet-fe6548b/dist/cartodb-leaflet-min.js"></script>
         <!--script type="text/javascript" src="JasonSanford-leaflet-vector-layers-70b2c88/dist/lvector.js"></script-->
         <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
         <script src="http://code.jquery.com/mobile/1.2.0-alpha.1/jquery.mobile-1.2.0-alpha.1.min.js"></script>
@@ -95,17 +94,12 @@
         });
         map.addLayer(mapQuest);
 
-        //**Fun with various attempted popups
-        //var popup = new L.CartoDBPopup();
-        //var popup = new L.popup();
-        //cartodb_leaflet.bindPopup("Test popup!");
-
         var cartodb_leaflet = new L.CartoDBLayer({
             map: map,
             user_name:'pdxmele',
             table_name: 'corners',
             query: "SELECT * FROM {{table_name}}",
-            //tile_style: "#{{table_name}}{marker-fill:red}",
+            //tile_style: "#{{table_name}}{marker-fill:red}", //use native Carto style instead for table
             interactivity: "cartodb_id, id, c_direct, st_lf_nm, st_rt_nm, to_dir_a, to_dir_b",
             featureOver: function(ev,latlng,pos,data) {
                 document.body.style.cursor = "pointer";
@@ -115,14 +109,16 @@
                 },
             //what happens when CartoDB feature is clicked
             featureClick: function(ev,latlng,pos,data) {
-                //set up the variables
+
+                //put cartodb data in another div, modified from example on cartodb mailing list
+                //first, set up the variables
                 var c_id = "";
                 var c_dir = "";
                 var lf_nm = "";
                 var rt_nm = "";
                 var dir_a = "";
                 var dir_b = "";
-                //fill in variables from selected cartoDB feature
+                //now, fill in variables from selected cartoDB feature
                 for (var column in data) {
                     if (column == "id") {
                         c_id = data[column];
@@ -153,38 +149,11 @@
 
                 //tell jQuery to open the popup
                 $('#myPopup').popup("open", {positionTo: "window"});
-
-                //**For a CartoDB popup, example from CartoDB website. If you use this, need to enable cartoDB popup script too
-                // Set popup content
-                // You can pass an Object, an Array or a String
-                //popup.setContent(form);
-                // Set latlng
-                //popup.setLatLng(latlng);
-                // Show it!
-                //map.openPopup(popup);
-
             },
+
             auto_bound: false
             });
         map.addLayer(cartodb_leaflet);
-
-        /* 
-        EXAMPLE FOR PUTTING CARTODB DATA IN ANOTHER DIV FROM CARTODB MAILING LIST:
-        featureClick: function(ev,latlng,pos,data) {
-            var html = "";
-            for (var column in data) {
-            html += '<label>' + column + '</label>';
-
-               html += '<p>' + data[column] + '</p>';
-
-            }
-            // If you are using jquery, add the html to the mydiv element
-            $("div#mydiv").html(html);
-
-            // If you are not using jquery
-            document.getElementById("mydiv").innnerHTML = html;
-        },
-        */
 
         map.addControl(new L.Control.Layers({'MapQuest Open':mapQuest, "Bing Aerial":bing}, {}));
         
@@ -195,6 +164,7 @@
                 .bindPopup("You are within " + radius + " meters from this point").openPopup();
             L.circle(e.latlng, radius).addTo(map);
             }*/
+
         function onLocationError(e) {
             alert(e.message);
             }
@@ -202,41 +172,33 @@
         map.on('locationerror', onLocationError);
         map.locate({setView: true, maxZoom: 18});
 
-        /*//refresh CartoDB Layer (from leaflet plugin docs)
-        //setOptions: Change any parameter at the same time refreshing the tiles once Example: 
-        //cartodb_leaflet.setOptions({query: "SELECT * FROM corners"}); 
-        map.on('mouseenter', function(e) {
-            cartodb_leaflet.setOptions({query: "SELECT * FROM corners"}); //NOT WORKING- TODO
-            //cartodb_leaflet.redraw(); 
-            });*/
-        }
-    )
+    });
 
-    //this function sends the form info to CartoDB
-    function processCornerForm() {
+        //this function sends the form info to CartoDB
+        function processCornerForm() {
 
-        //grab the information from the form
-        var id = document.getElementById("c_id").innerHTML;
-        var a_ramp = document.cornerForm.aRamp.value;
-        var b_ramp = document.cornerForm.bRamp.value;
-        var texture = document.cornerForm.texture.value;
-        var flags = document.cornerForm.flags.value;
+            //grab the information from the form
+            var id = document.getElementById("c_id").innerHTML; //TODO: switch over to jQuery 
+            var a_ramp = document.cornerForm.aRamp.value; //TODO: switch over to jQuery
+            var b_ramp = document.cornerForm.bRamp.value; //TODO: switch over to jQuery
+            var texture = document.cornerForm.texture.value; //TODO: switch over to jQuery
+            var flags = document.cornerForm.flags.value; //TODO: switch over to jQuery
 
-        //put together the query
-        var query = "q=UPDATE corners SET evaluated = 'y', rramp = '"+a_ramp+"', lramp = '"+b_ramp+"', texture = '"+texture+"', flags = '"+flags+"' where id = '"+id+"'&api_key=df65312f62568527b7750a1266233be8a3d6c56c";
-        //the above key is mine for the purposes of this test/dev site, you will get your own with your cartodb account
-                
-        //for debugging
-        //alert(query);
-                
-        //post the query!
-        $.post("http://pdxmele.cartodb.com/api/v2/sql", query, alert ("Successfully posted to database"));
+            //put together the query
+            var query = "q=UPDATE corners SET evaluated = 'y', rramp = '"+a_ramp+"', lramp = '"+b_ramp+"', texture = '"+texture+"', flags = '"+flags+"' where id = '"+id+"'&api_key=df65312f62568527b7750a1266233be8a3d6c56c";
+            //the above key is mine for the purposes of this test/dev site, you will get your own with your cartodb account
+                    
+            //for debugging
+            //alert(query);
+                    
+            //post the query!
+            $.post("http://pdxmele.cartodb.com/api/v2/sql", query, alert ("Successfully posted to database"));
 
-        //go back to the main page
-        $('#myPopup').popup("close");
-        
-        return;
-        }
+            //go back to the main page
+            $('#myPopup').popup("close");
+            
+            return;
+        };
     
     </script>
 
