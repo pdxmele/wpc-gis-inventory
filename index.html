@@ -11,6 +11,8 @@
         <script src="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
         <script src="bing.js"></script>
         <script src="lvector.js"></script>
+        <script type="text/javascript" src="Vizzuality-cartodb-leaflet-96393f8/js/wax.leaf.min-7.0.0dev1-touched.js"></script>
+        <script type="text/javascript" src="Vizzuality-cartodb-leaflet-96393f8/dist/cartodb-leaflet-min.js"></script>
         <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
         <script src="http://code.jquery.com/mobile/1.2.0-alpha.1/jquery.mobile-1.2.0-alpha.1.min.js"></script>
        
@@ -18,9 +20,49 @@
         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0-alpha.1/jquery.mobile-1.2.0-alpha.1.min.css" />
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.css" />
         <!--[if IE]> <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /> <![endif]-->
+        <link href="Vizzuality-cartodb-leaflet-96393f8/css/cartodb-leaflet.css" rel="stylesheet" type="text/css" />
 
     <body>
         <div id="map"></div>
+        <div data-role="popup" id="myPopup" class="ui-content" data-overlay-theme="a" data-theme="b">
+            <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+            <div style="text-align:center"><h4>Corner #<div id="c_id" style="display: inline"></div> - <div id="c_dir" style="display: inline"></div> corner of</h4>
+            <h4><div id="rt_nm" style="display: inline"></div> and <div id="lf_nm" style="display: inline"></div></h4></div>
+            <form name= "cornerForm">
+                <span>Is there a curb ramp for crossing to the <div id="dir_a" style="display: inline"></div> corner?</span>
+                <select name="aRamp">
+                    <option>Select</option>
+                    <option value="y">yes</option>
+                    <option value="n">no</option>
+                </select>
+                <span>Is there a curb ramp for crossing to the <div id="dir_b" style="display: inline"></div> corner?</span>
+                <select name="bRamp">
+                    <option>Select</option>
+                    <option value="y">yes</option>
+                    <option value="n">no</option>
+                </select>
+                <span>Are the ramps textured?</span>
+                <select name="texture">
+                    <option>Select</option>
+                    <option value="y">yes</option>
+                    <option value="n">no</option><option value="r">only for the first crossing</option>
+                    <option value="l">only for the second crossing</option>
+                </select>
+                <span>Any potential problems with the following:</span>
+                <select name="flags">
+                    <option select="">Select</option>
+                    <option value="none">none</option>
+                    <option value="safety">safety</option>
+                    <option value="slope">slope</option>
+                    <option value="drainage">drainage</option>
+                    <option value="safety, slope">safety and slope</option>
+                    <option value="safety, drainage">safety and drainage</option>
+                    <option value="slope, drainage">slope and drainage</option>
+                    <option value="safety, slope, drainage">safety, slope, and drainage</option>
+                </select>
+                <span>Ready to send?</span><input type="button" value="Submit" onClick="processCornerForm()" />
+            </form>
+        </div>
     </body>
  
     <!--my script-->
@@ -33,7 +75,8 @@
 
         var map = new L.Map('map', {
             center: new L.LatLng(45.53266, -122.66002),
-            zoom: 18
+            zoom: 18,
+            maxZoom: 18
         });
 
         var bing = new L.BingLayer("Ao5Ew1XnxVey8Mh0jgfL32mbQN1pNLQoDv48u1r5BJrGsf8r0Bach7FYO5wTpbHl");
@@ -69,32 +112,97 @@
             //scaleRange: [16, 20],
             
             symbology: {
-                type: "unique", // Defines the symbology as a unique type where features with an attribute of a specific value are symbolized the same way
-                property: "evaluated", // The property (field, attribute) to use for defining unique values and styles
-                values: [ // An array of values to set symbology. Each value has a specific symbology
+                type: "unique",
+                property: "evaluated",
+                values: [
                     {
-                        value: "y", // If feature.properties.DISTRICT == "A"
+                        value: "y",
                         vectorOptions: {
-                            icon: new customMarker1("img/y.png")
+                            icon: new customMarker1("img/y.png"),
+                            clickable: false
                         }
                     },
                     {
                         value: "n",
                         vectorOptions: {
-                            icon: new customMarker2("img/n.png")
+                            icon: new customMarker2("img/n.png"),
+                            clickable: false
                         }
                     }
                 ]
             },
             dynamic: true,
             autoUpdate: true,
-            autoUpdateInterval: 60000,
+            autoUpdateInterval: 60000 
+
+            /* OLD LEAFLET POPUP CODE (works, but not well for mobile -- use an invisible CartoDB plugin layer instead)
+            ,
             popupTemplate: '<div style="text-align:center"><h4>Corner #<div id="c_id" style="display: inline">{id}</div> - <div id="c_dir" style="display: inline">{c_direct}</div> corner of<br/><div id="rt_nm" style="display: inline">{st_rt_nm}</div> and <div id="lf_nm" style="display: inline">{st_lf_nm}</div></h4></div><form name= "cornerForm"><p>Curb ramp for crossing to the {to_dir_a} corner?<br /><select name="aRamp"><option>Select</option><option value="y">yes</option><option value="n">no</option></select></p><p>Curb ramp for crossing to the {to_dir_b} corner?<br /><select name="bRamp"><option>Select</option><option value="y">yes</option><option value="n">no</option></select></p><p>Are the ramps textured?<br /><select name="texture"><option>Select</option><option value="y">yes</option><option value="n">no</option><option value="r">only for the first crossing</option><option value="l">only for the second crossing</option></select></p><p>Any potential problems with the following:<br /><select name="flags"><option select="">Select</option><option value="none">none</option><option value="safety">safety</option><option value="slope">slope</option><option value="drainage">drainage</option><option value="safety, slope">safety and slope</option><option value="safety, drainage">safety and drainage</option><option value="slope, drainage">slope and drainage</option><option value="safety, slope, drainage">safety, slope, and drainage</option></select></p><p>Ready to send? <input type="button" value="Submit" onClick="processCornerForm()" /></p></form></div>',
             singlePopup: true,
-            popupOptions: {minWidth: 275, maxWidth: 275}
+            popupOptions: {minWidth: 275, maxWidth: 275}*/
         });
 
         cartodb_layer.setMap(map);
+
+        //custom jQuery popup via invisible CartoDB plugin layer
+        var cartodb_clickable = new L.CartoDBLayer({
+            map: map,
+            user_name:'pdxmele',
+            table_name: 'corners',
+            query: "SELECT * FROM {{table_name}}",
+            opacity: 0,
+            interactivity: "cartodb_id, id, c_direct, st_lf_nm, st_rt_nm, to_dir_a, to_dir_b",
+            featureOver: function(ev,latlng,pos,data) {document.body.style.cursor = "pointer";},
+            featureOut: function() {document.body.style.cursor = "default";},
+            //what happens when CartoDB feature is clicked
+            featureClick: function(ev,latlng,pos,data) {
+
+                //will highlight clicked feature when cartodb leaflet plugin issue w/hover point style is fixed (https://github.com/Vizzuality/cartodb-leaflet/issues/22)
+
+                //put cartodb data in another div, modified from example on cartodb mailing list
+                //first, set up the variables
+                var c_id = "";
+                var c_dir = "";
+                var lf_nm = "";
+                var rt_nm = "";
+                var dir_a = "";
+                var dir_b = "";
+                //now, fill in variables from selected cartoDB feature
+                for (var column in data) {
+                    if (column == "id") {
+                        c_id = data[column];
+                    }
+                    else if (column == "c_direct") {
+                        c_dir = data[column];
+                    }
+                    else if (column == "st_lf_nm") {
+                        lf_nm = data[column];
+                    }
+                    else if (column == "st_rt_nm") {
+                        rt_nm = data[column];
+                    }
+                    else if (column == "to_dir_a") {
+                        dir_a = data[column];
+                    }
+                    else if (column == "to_dir_b") {
+                        dir_b = data[column];
+                    }
+                }
+                //send the variables to the corresponding divs in the form
+                $("div#c_id").html(c_id);
+                $("div#c_dir").html(c_dir);
+                $("div#lf_nm").html(lf_nm);
+                $("div#rt_nm").html(rt_nm);
+                $("div#dir_a").html(dir_a);
+                $("div#dir_b").html(dir_b);
+
+                //tell jQuery to open the popup
+                $('#myPopup').popup("open", {positionTo: "window"});
+            },
+
+            auto_bound: false
+            });
+        map.addLayer(cartodb_clickable);
 
         map.addControl(new L.Control.Layers({'MapQuest Open':mapQuest, "Bing Aerial":bing}, {}));
         
@@ -135,9 +243,8 @@
     //post the query!
     $.post("http://pdxmele.cartodb.com/api/v2/sql", query, alert ("Successfully posted to database"));
 
-    //close the popup -- the old way, no longer works. TODO: find a new way to auto-close popup
-    //$('#myPopup').popup("close");
-    //location.reload(); -- works to close popup, but screws up auto-update and submit?
+    //close the popup 
+    $('#myPopup').popup("close");
             
     return;
     }
