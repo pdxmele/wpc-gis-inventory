@@ -8,20 +8,22 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
         <!--leaflet & jquery links-->
-        <script src="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
-        <script src="bing.js"></script>
-        <script src="lvector.js"></script>
-        <script type="text/javascript" src="Vizzuality-cartodb-leaflet-96393f8/js/wax.leaf.min-7.0.0dev1-touched.js"></script>
-        <script type="text/javascript" src="Vizzuality-cartodb-leaflet-96393f8/dist/cartodb-leaflet-min.js"></script>
+        <script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.js"></script>
+        <script src="lib/bing.js"></script>
+        <script src="lib/leaflet-vector-layers-master/dist/lvector.js"></script>
+        <script type="text/javascript" src="lib/Vizzuality-cartodb-leaflet-dbcb009/js/wax.leaf.min.js"></script>
+        <script type="text/javascript" src="lib/Vizzuality-cartodb-leaflet-dbcb009/dist/cartodb-leaflet-min.js"></script>
         <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
         <script src="http://code.jquery.com/mobile/1.2.0-alpha.1/jquery.mobile-1.2.0-alpha.1.min.js"></script>
        
         <!-- styles -->
         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0-alpha.1/jquery.mobile-1.2.0-alpha.1.min.css" />
-        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.css" />
-        <!--[if IE]> <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" /> <![endif]-->
-        <link href="Vizzuality-cartodb-leaflet-96393f8/css/cartodb-leaflet.css" rel="stylesheet" type="text/css" />
-
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.css" />
+        <!--[if lte IE 8]>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.ie.css" />
+        <![endif]-->
+        <link href="lib/Vizzuality-cartodb-leaflet-dbcb009/css/cartodb-leaflet.css" rel="stylesheet" type="text/css" />
+    </head>
     <body>
         <div id="map"></div>
         <div data-role="popup" id="myPopup" class="ui-content" data-overlay-theme="a" data-theme="b">
@@ -108,9 +110,7 @@
         var cartodb_layer = new lvector.CartoDB({
             user: "pdxmele",
             table: "corners",
-            //map: map,
-            //scaleRange: [16, 20],
-            
+            //scaleRange: [10, 20],
             symbology: {
                 type: "unique",
                 property: "evaluated",
@@ -118,14 +118,18 @@
                     {
                         value: "y",
                         vectorOptions: {
-                            icon: new customMarker1("img/y.png"),
+                            icon: new customMarker1({
+                                iconUrl: "img/y.png"
+                                }),
                             clickable: false
                         }
                     },
                     {
                         value: "n",
                         vectorOptions: {
-                            icon: new customMarker2("img/n.png"),
+                            icon: new customMarker2({
+                                iconUrl: "img/n.png"
+                                }),
                             clickable: false
                         }
                     }
@@ -144,6 +148,7 @@
 
         cartodb_layer.setMap(map);
 
+        
         //custom jQuery popup via invisible CartoDB plugin layer
         var cartodb_clickable = new L.CartoDBLayer({
             map: map,
@@ -203,6 +208,7 @@
             auto_bound: false
             });
         map.addLayer(cartodb_clickable);
+        
 
         map.addControl(new L.Control.Layers({'MapQuest Open':mapQuest, "Bing Aerial":bing}, {}));
         
