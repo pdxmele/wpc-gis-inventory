@@ -6,7 +6,6 @@
         <meta name="description" content="An app for use by the WPC GIS Jam group and volunteers for a curb ramp inventory in Portland, OR.">
         <meta name="author" content="Mele Sax-Barnett http://pdxmele.github.com/pdxmele">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <meta name="apple-mobile-web-app-capable" content="yes" />
 
         <!--leaflet & jquery links-->
         <script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.js"></script>
@@ -14,11 +13,11 @@
         <script src="lib/leaflet-vector-layers-master/dist/lvector.js"></script>
         <script type="text/javascript" src="lib/Vizzuality-cartodb-leaflet-dbcb009/js/wax.leaf.min.js"></script>
         <script type="text/javascript" src="lib/Vizzuality-cartodb-leaflet-dbcb009/dist/cartodb-leaflet-min.js"></script>
-        <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-        <script src="http://code.jquery.com/mobile/1.2.0-alpha.1/jquery.mobile-1.2.0-alpha.1.min.js"></script>
+        <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+        <script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
        
         <!-- styles -->
-        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0-alpha.1/jquery.mobile-1.2.0-alpha.1.min.css" />
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.css" />
         <!--[if lte IE 8]>
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.ie.css" />
@@ -74,23 +73,20 @@
     (function($){
         $.ajaxSetup({cache:false});
 
-        $(document).ready(function() {
-            $('#map').css('height', ($(window).height()));
-
             var bing = new L.BingLayer("Ao5Ew1XnxVey8Mh0jgfL32mbQN1pNLQoDv48u1r5BJrGsf8r0Bach7FYO5wTpbHl");
 
             var mapQuest = new L.TileLayer("http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png", {
                     maxZoom: 18,
                     subdomains: ["otile1", "otile2", "otile3", "otile4"],
-                    attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>. Map data (c) <a href="http://www.openstreetmap.org/license" target="_blank">OpenStreetMap</a> contributors.'
+                    attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>. Map data (c) <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
             });
 
-            /*
-            //I'm turning this layer off and just using CartoDB layer instead because I can't get these icons to center properly anymore. Unfortunately, this means I can't get it to auto-refresh, but we shouldn't need that once we change the general structure of the UI soon.
+            
+            //This is broken for some reason-- the icons refuse to center in the right place
 
             var customMarker = L.Icon.extend({
                 iconSize: [-16, -16],
-                iconAnchor: [8, 8]
+                iconAnchor: [40, 40]
             });
 
             //using leaflet vector layers plugin, most of code from examples. See http://geojason.info/leaflet-vector-layers
@@ -124,7 +120,7 @@
                     },
                 dynamic: true,
                 autoUpdate: true,
-                autoUpdateInterval: 60000 */
+                autoUpdateInterval: 60000 
 
                 /* OLD LEAFLET POPUP CODE (works, but not well for mobile -- use an invisible CartoDB plugin layer instead)
                 ,
@@ -132,7 +128,10 @@
                 singlePopup: true,
                 popupOptions: {minWidth: 275, maxWidth: 275}*/
 
-                /*});*/
+                });
+
+        $(document).ready(function() {
+            $('#map').css('height', ($(window).height()));
 
             var map = new L.Map('map', {
                 center: new L.LatLng(45.53266, -122.66002),
@@ -141,7 +140,7 @@
                 });
             
             map.addLayer(mapQuest);
-            //cartodb_layer.setMap(map);
+            cartodb_layer.setMap(map);
 
             //custom jQuery popup via invisible CartoDB plugin layer
             var cartodb_clickable = new L.CartoDBLayer({
@@ -149,7 +148,7 @@
                 user_name:'pdxmele',
                 table_name: 'corners',
                 //query: "SELECT * FROM {{table_name}}",
-                opacity: 0.8,
+                opacity: 0,
                 interactivity: "cartodb_id, id, c_direct, st_lf_nm, st_rt_nm, to_dir_a, to_dir_b",
                 featureOver: function(ev,latlng,pos,data) {
                     document.body.style.cursor = "pointer";
@@ -205,7 +204,7 @@
             });
 
             map.addLayer(cartodb_clickable);
-            cartodb_clickable.bringToFront();
+            //cartodb_clickable.bringToFront();
         
             map.addControl(new L.Control.Layers({'MapQuest Open':mapQuest, 'Bing Aerial':bing}, {}));
 
