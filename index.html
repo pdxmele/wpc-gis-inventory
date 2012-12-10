@@ -6,6 +6,7 @@
         <meta name="description" content="An app for use by the WPC GIS Jam group and volunteers for a curb ramp inventory in Portland, OR.">
         <meta name="author" content="Mele Sax-Barnett http://pdxmele.github.com/pdxmele">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes" />
 
         <!--leaflet & jquery links-->
         <script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.js"></script>
@@ -70,189 +71,189 @@
     <!--my script-->
     <script type ="text/javascript">
 
-    $(document).ready(function() {
-
+    (function($){
         $.ajaxSetup({cache:false});
-        $('#map').css('height', ($(window).height()));
 
-        var map = new L.Map('map', {
-            center: new L.LatLng(45.53266, -122.66002),
-            zoom: 18,
-            maxZoom: 18
-        });
+        $(document).ready(function() {
+            $('#map').css('height', ($(window).height()));
 
-        var bing = new L.BingLayer("Ao5Ew1XnxVey8Mh0jgfL32mbQN1pNLQoDv48u1r5BJrGsf8r0Bach7FYO5wTpbHl");
+            var bing = new L.BingLayer("Ao5Ew1XnxVey8Mh0jgfL32mbQN1pNLQoDv48u1r5BJrGsf8r0Bach7FYO5wTpbHl");
 
-        var mapQuest = new L.TileLayer("http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png", {
-                maxZoom: 18,
-                subdomains: ["otile1", "otile2", "otile3", "otile4"],
-                attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>. Map data (c) <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> contributors, CC-BY-SA.'
-        });
-        map.addLayer(mapQuest);
-
-        var customMarker1 = L.Icon.extend({
-            iconUrl: "img/y.png",
-            shadowUrl: null,
-            iconSize: new L.Point(16, 16),
-            iconAnchor: new L.Point(8, 8),
-            popupAnchor: new L.Point(1, -8)
-        });
-
-        var customMarker2 = L.Icon.extend({
-            iconUrl: "img/n.png",
-            shadowUrl: null,
-            iconSize: new L.Point(16, 16),
-            iconAnchor: new L.Point(8, 8),
-            popupAnchor: new L.Point(1, -8)
-        });
-
-        //using leaflet vector layers plugin, most of code from examples. See http://geojason.info/leaflet-vector-layers
-        var cartodb_layer = new lvector.CartoDB({
-            user: "pdxmele",
-            table: "corners",
-            //scaleRange: [10, 20],
-            symbology: {
-                type: "unique",
-                property: "evaluated",
-                values: [
-                    {
-                        value: "y",
-                        vectorOptions: {
-                            icon: new customMarker1({
-                                iconUrl: "img/y.png"
-                                }),
-                            clickable: false
-                        }
-                    },
-                    {
-                        value: "n",
-                        vectorOptions: {
-                            icon: new customMarker2({
-                                iconUrl: "img/n.png"
-                                }),
-                            clickable: false
-                        }
-                    }
-                ]
-            },
-            dynamic: true,
-            autoUpdate: true,
-            autoUpdateInterval: 60000 
-
-            /* OLD LEAFLET POPUP CODE (works, but not well for mobile -- use an invisible CartoDB plugin layer instead)
-            ,
-            popupTemplate: '<div style="text-align:center"><h4>Corner #<div id="c_id" style="display: inline">{id}</div> - <div id="c_dir" style="display: inline">{c_direct}</div> corner of<br/><div id="rt_nm" style="display: inline">{st_rt_nm}</div> and <div id="lf_nm" style="display: inline">{st_lf_nm}</div></h4></div><form name= "cornerForm"><p>Curb ramp for crossing to the {to_dir_a} corner?<br /><select name="aRamp"><option>Select</option><option value="y">yes</option><option value="n">no</option></select></p><p>Curb ramp for crossing to the {to_dir_b} corner?<br /><select name="bRamp"><option>Select</option><option value="y">yes</option><option value="n">no</option></select></p><p>Are the ramps textured?<br /><select name="texture"><option>Select</option><option value="y">yes</option><option value="n">no</option><option value="r">only for the first crossing</option><option value="l">only for the second crossing</option></select></p><p>Any potential problems with the following:<br /><select name="flags"><option select="">Select</option><option value="none">none</option><option value="safety">safety</option><option value="slope">slope</option><option value="drainage">drainage</option><option value="safety, slope">safety and slope</option><option value="safety, drainage">safety and drainage</option><option value="slope, drainage">slope and drainage</option><option value="safety, slope, drainage">safety, slope, and drainage</option></select></p><p>Ready to send? <input type="button" value="Submit" onClick="processCornerForm()" /></p></form></div>',
-            singlePopup: true,
-            popupOptions: {minWidth: 275, maxWidth: 275}*/
-        });
-
-        cartodb_layer.setMap(map);
-
-        
-        //custom jQuery popup via invisible CartoDB plugin layer
-        var cartodb_clickable = new L.CartoDBLayer({
-            map: map,
-            user_name:'pdxmele',
-            table_name: 'corners',
-            query: "SELECT * FROM {{table_name}}",
-            opacity: 0,
-            interactivity: "cartodb_id, id, c_direct, st_lf_nm, st_rt_nm, to_dir_a, to_dir_b",
-            featureOver: function(ev,latlng,pos,data) {document.body.style.cursor = "pointer";},
-            featureOut: function() {document.body.style.cursor = "default";},
-            //what happens when CartoDB feature is clicked
-            featureClick: function(ev,latlng,pos,data) {
-
-                //will highlight clicked feature when cartodb leaflet plugin issue w/hover point style is fixed (https://github.com/Vizzuality/cartodb-leaflet/issues/22)
-
-                //put cartodb data in another div, modified from example on cartodb mailing list
-                //first, set up the variables
-                var c_id = "";
-                var c_dir = "";
-                var lf_nm = "";
-                var rt_nm = "";
-                var dir_a = "";
-                var dir_b = "";
-                //now, fill in variables from selected cartoDB feature
-                for (var column in data) {
-                    if (column == "id") {
-                        c_id = data[column];
-                    }
-                    else if (column == "c_direct") {
-                        c_dir = data[column];
-                    }
-                    else if (column == "st_lf_nm") {
-                        lf_nm = data[column];
-                    }
-                    else if (column == "st_rt_nm") {
-                        rt_nm = data[column];
-                    }
-                    else if (column == "to_dir_a") {
-                        dir_a = data[column];
-                    }
-                    else if (column == "to_dir_b") {
-                        dir_b = data[column];
-                    }
-                }
-                //send the variables to the corresponding divs in the form
-                $("div#c_id").html(c_id);
-                $("div#c_dir").html(c_dir);
-                $("div#lf_nm").html(lf_nm);
-                $("div#rt_nm").html(rt_nm);
-                $("div#dir_a").html(dir_a);
-                $("div#dir_b").html(dir_b);
-
-                //tell jQuery to open the popup
-                $('#myPopup').popup("open", {positionTo: "window"});
-            },
-
-            auto_bound: false
+            var mapQuest = new L.TileLayer("http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png", {
+                    maxZoom: 18,
+                    subdomains: ["otile1", "otile2", "otile3", "otile4"],
+                    attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>. Map data (c) <a href="http://www.openstreetmap.org/license" target="_blank">OpenStreetMap</a> contributors.'
             });
-        map.addLayer(cartodb_clickable);
+
+            /*
+            //I'm turning this layer off and just using CartoDB layer instead because I can't get these icons to center properly anymore. Unfortunately, this means I can't get it to auto-refresh, but we shouldn't need that once we change the general structure of the UI soon.
+
+            var customMarker = L.Icon.extend({
+                iconSize: [-16, -16],
+                iconAnchor: [8, 8]
+            });
+
+            //using leaflet vector layers plugin, most of code from examples. See http://geojason.info/leaflet-vector-layers
+            var cartodb_layer = new lvector.CartoDB({
+                user: "pdxmele",
+                table: "corners",
+                //scaleRange: [10, 20],
+                symbology: {
+                    type: "unique",
+                    property: "evaluated",
+                    values: [
+                        {
+                            value: "y",
+                            vectorOptions: {
+                                icon: new customMarker({
+                                    iconUrl: "img/y.png"
+                                    }),
+                                clickable: false
+                                }
+                            },
+                        {
+                            value: "n",
+                            vectorOptions: {
+                                icon: new customMarker({
+                                    iconUrl: "img/n.png"
+                                    }),
+                                clickable: false
+                                }
+                            }
+                        ]
+                    },
+                dynamic: true,
+                autoUpdate: true,
+                autoUpdateInterval: 60000 */
+
+                /* OLD LEAFLET POPUP CODE (works, but not well for mobile -- use an invisible CartoDB plugin layer instead)
+                ,
+                popupTemplate: '<div style="text-align:center"><h4>Corner #<div id="c_id" style="display: inline">{id}</div> - <div id="c_dir" style="display: inline">{c_direct}</div> corner of<br/><div id="rt_nm" style="display: inline">{st_rt_nm}</div> and <div id="lf_nm" style="display: inline">{st_lf_nm}</div></h4></div><form name= "cornerForm"><p>Curb ramp for crossing to the {to_dir_a} corner?<br /><select name="aRamp"><option>Select</option><option value="y">yes</option><option value="n">no</option></select></p><p>Curb ramp for crossing to the {to_dir_b} corner?<br /><select name="bRamp"><option>Select</option><option value="y">yes</option><option value="n">no</option></select></p><p>Are the ramps textured?<br /><select name="texture"><option>Select</option><option value="y">yes</option><option value="n">no</option><option value="r">only for the first crossing</option><option value="l">only for the second crossing</option></select></p><p>Any potential problems with the following:<br /><select name="flags"><option select="">Select</option><option value="none">none</option><option value="safety">safety</option><option value="slope">slope</option><option value="drainage">drainage</option><option value="safety, slope">safety and slope</option><option value="safety, drainage">safety and drainage</option><option value="slope, drainage">slope and drainage</option><option value="safety, slope, drainage">safety, slope, and drainage</option></select></p><p>Ready to send? <input type="button" value="Submit" onClick="processCornerForm()" /></p></form></div>',
+                singlePopup: true,
+                popupOptions: {minWidth: 275, maxWidth: 275}*/
+
+                /*});*/
+
+            var map = new L.Map('map', {
+                center: new L.LatLng(45.53266, -122.66002),
+                zoom: 18 /*,
+                maxZoom: 18*/
+                });
+            
+            map.addLayer(mapQuest);
+            //cartodb_layer.setMap(map);
+
+            //custom jQuery popup via invisible CartoDB plugin layer
+            var cartodb_clickable = new L.CartoDBLayer({
+                map: map,
+                user_name:'pdxmele',
+                table_name: 'corners',
+                //query: "SELECT * FROM {{table_name}}",
+                opacity: 0.8,
+                interactivity: "cartodb_id, id, c_direct, st_lf_nm, st_rt_nm, to_dir_a, to_dir_b",
+                featureOver: function(ev,latlng,pos,data) {
+                    document.body.style.cursor = "pointer";
+                    },
+                featureOut: function() {
+                    document.body.style.cursor = "default";
+                    },
+                //what happens when CartoDB feature is clicked
+                featureClick: function(ev,latlng,pos,data) {
+
+                    //put cartodb data in another div, modified from example on cartodb mailing list
+                    //first, set up the variables
+                    var c_id = "";
+                    var c_dir = "";
+                    var lf_nm = "";
+                    var rt_nm = "";
+                    var dir_a = "";
+                    var dir_b = "";
+                    //now, fill in variables from selected cartoDB feature
+                    for (var column in data) {
+                        if (column == "id") {
+                            c_id = data[column];
+                            }
+                        else if (column == "c_direct") {
+                            c_dir = data[column];
+                            }
+                        else if (column == "st_lf_nm") {
+                            lf_nm = data[column];
+                            }
+                        else if (column == "st_rt_nm") {
+                            rt_nm = data[column];
+                            }
+                        else if (column == "to_dir_a") {
+                            dir_a = data[column];
+                            }
+                        else if (column == "to_dir_b") {
+                            dir_b = data[column];
+                            }
+                        }
+                    //send the variables to the corresponding divs in the form
+                    $("div#c_id").html(c_id);
+                    $("div#c_dir").html(c_dir);
+                    $("div#lf_nm").html(lf_nm);
+                    $("div#rt_nm").html(rt_nm);
+                    $("div#dir_a").html(dir_a);
+                    $("div#dir_b").html(dir_b);
+
+                    //tell jQuery to open the popup
+                    $('#myPopup').popup("open", {positionTo: "window"});
+                    },
+
+                auto_bound: false
+            });
+
+            map.addLayer(cartodb_clickable);
+            cartodb_clickable.bringToFront();
         
+            map.addControl(new L.Control.Layers({'MapQuest Open':mapQuest, 'Bing Aerial':bing}, {}));
 
-        map.addControl(new L.Control.Layers({'MapQuest Open':mapQuest, "Bing Aerial":bing}, {}));
-        
-        /*various other optional location stuff from leaflet mobile example
-        function onLocationFound(e) {
-            var radius = e.accuracy / 2;
-            L.marker(e.latlng).addTo(map)
-                .bindPopup("You are within " + radius + " meters from this point").openPopup();
-            L.circle(e.latlng, radius).addTo(map);
-            }*/
+            /*various other optional location stuff from leaflet mobile example
+            function onLocationFound(e) {
+                var radius = e.accuracy / 2;
+                L.marker(e.latlng).addTo(map)
+                    .bindPopup("You are within " + radius + " meters from this point").openPopup();
+                L.circle(e.latlng, radius).addTo(map);
+                }
+            //map.on('locationfound', onLocationFound); */
 
-        function onLocationError(e) {
-            alert(e.message);
-            }
-        //map.on('locationfound', onLocationFound);
-        map.on('locationerror', onLocationError);
-        map.locate({setView: true, maxZoom: 18});
+            function onLocationError(e) {
+                //alert(e.message);
+                }
 
-    });
+            map.on('locationerror', onLocationError);
+
+            map.locate({setView: true, maxZoom: 18});
+
+        });
+
+    }(jQuery));
 
     //this function sends the form info to CartoDB
     function processCornerForm() {
 
-    //grab the information from the form
-    var id = document.getElementById("c_id").innerHTML; //TODO: switch over to jQuery 
-    var a_ramp = document.cornerForm.aRamp.value; //TODO: switch over to jQuery
-    var b_ramp = document.cornerForm.bRamp.value; //TODO: switch over to jQuery
-    var texture = document.cornerForm.texture.value; //TODO: switch over to jQuery
-    var flags = document.cornerForm.flags.value; //TODO: switch over to jQuery
+        //grab the information from the form
+        var id = document.getElementById("c_id").innerHTML; //TODO: switch over to jQuery 
+        var a_ramp = document.cornerForm.aRamp.value; //TODO: switch over to jQuery
+        var b_ramp = document.cornerForm.bRamp.value; //TODO: switch over to jQuery
+        var texture = document.cornerForm.texture.value; //TODO: switch over to jQuery
+        var flags = document.cornerForm.flags.value; //TODO: switch over to jQuery
 
-    //put together the query
-    var query = "q=UPDATE corners SET evaluated = 'y', rramp = '"+a_ramp+"', lramp = '"+b_ramp+"', texture = '"+texture+"', flags = '"+flags+"' where id = '"+id+"'&api_key=df65312f62568527b7750a1266233be8a3d6c56c";
-    //the above key is mine for the purposes of this test/dev site, you will get your own with your cartodb account
-                    
-    //for debugging
-    //alert(query);
-                    
-    //post the query!
-    $.post("http://pdxmele.cartodb.com/api/v2/sql", query, alert ("Successfully posted to database"));
+        //put together the query
+        var query = "q=UPDATE corners SET evaluated = 'y', rramp = '"+a_ramp+"', lramp = '"+b_ramp+"', texture = '"+texture+"', flags = '"+flags+"' where id = '"+id+"'&api_key=df65312f62568527b7750a1266233be8a3d6c56c";
+        //the above key is mine for the purposes of this test/dev site, you will get your own with your cartodb account
+                        
+        //for debugging
+        //alert(query);
+                        
+        //post the query!
+        $.post("http://pdxmele.cartodb.com/api/v2/sql", query, alert ("Successfully posted to database"));
 
-    //close the popup 
-    $('#myPopup').popup("close");
-            
-    return;
+        //close the popup 
+        $('#myPopup').popup("close");
+                
+        return;
     }
     
     </script>
