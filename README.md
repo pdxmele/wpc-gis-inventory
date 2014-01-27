@@ -1,8 +1,6 @@
-IMPORTANT: I am no longer actively working on this project -- it now lives with other maintainers at https://github.com/OregonWalks/curb-ramp-survey
+Note: Original version, later redone over at https://github.com/pdxmele/ow-gis-inventory/ . Now lives with other maintainers at https://github.com/OregonWalks/curb-ramp-survey
 
-======
-
-Note: Abandoned. Leaving this version alone and rewriting over in https://github.com/pdxmele/ow-gis-inventory/ . 
+--
 
 ## WPC GIS Curb Ramp Inventory App, version 0.2.2
 
